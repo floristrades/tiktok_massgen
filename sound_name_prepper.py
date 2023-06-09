@@ -24,6 +24,11 @@ def log_filename(database_file, filename):
     conn.commit()
     conn.close()
 
+def strip_numbers_and_underscores(filename):
+    while filename and (filename[0].isdigit() or filename[0] == '_'):
+        filename = filename[1:]
+    return filename
+
 def convert_filenames(directory, database_file):
     # Get the list of files in the directory
     files = os.listdir(directory)
@@ -40,8 +45,11 @@ def convert_filenames(directory, database_file):
 
     # Iterate over the MP3 files and rename them
     for i, filename in enumerate(mp3_files):
+        # Strip numbers and "_" characters from the beginning of the filename
+        stripped_filename = strip_numbers_and_underscores(filename)
+
         # Remove the file extension
-        name, extension = os.path.splitext(filename)
+        name, extension = os.path.splitext(stripped_filename)
 
         # Convert the name to lowercase
         name = name.lower()
@@ -49,11 +57,18 @@ def convert_filenames(directory, database_file):
         # Generate the new filename
         new_filename = f"{i+1}_{name}{extension}"
 
-        # Rename the file
-        os.rename(os.path.join(directory, filename), os.path.join(directory, new_filename))
+        # Get the full file paths
+        old_path = os.path.join(directory, filename)
+        new_path = os.path.join(directory, new_filename)
 
-        # Log the filename in the database
-        log_filename(database_file, new_filename)
+        # Check if the file exists before renaming
+        if os.path.exists(old_path):
+            os.rename(old_path, new_path)
+
+            # Log the filename in the database
+            log_filename(database_file, new_filename)
+        else:
+            print(f"File not found: {old_path}")
 
     print(f"Converted {len(mp3_files)} filenames in directory: {directory}")
 
