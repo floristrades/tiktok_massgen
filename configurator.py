@@ -30,6 +30,8 @@ class AudioConfigWidget(QWidget):
         font = QFont()
         font.setPointSize(12)  # Increase the font size
 
+        library_vlayout = QVBoxLayout()
+
         profile_layout = QHBoxLayout()
         profile_layout.setContentsMargins(0, 0, 0, 0)  # Adjust top margin if needed
         profile_layout.setAlignment(Qt.AlignHCenter)  # Align the components in the middle of the horizontal axis
@@ -39,7 +41,7 @@ class AudioConfigWidget(QWidget):
         profile_layout.addWidget(profile_frame)
 
         profile_frame_layout = QHBoxLayout(profile_frame)
-        profile_frame_layout.setContentsMargins(76, 15, 76, 15)  # Adjust margins if needed
+        profile_frame_layout.setContentsMargins(95, 15, 95, 15)  # Adjust margins if needed
 
         profile_label = QLabel('Profile Selection:')
         profile_label.setStyleSheet("QLabel { border: none; }")  # Remove the border around the label text
@@ -51,11 +53,47 @@ class AudioConfigWidget(QWidget):
         profile_combo_box.addItems(['Seamus magic formula', 'Luke belmar', 'Profile 3'])  # Add profile options
         profile_frame_layout.addWidget(profile_combo_box)
 
+        # Add a stretch item to make the border stretch
+        profile_frame_layout.addStretch()
+
         layout.addLayout(profile_layout)
+
+        audioLib_layout = QHBoxLayout()
+        audioLib_layout.setContentsMargins(0, 0, 0, 0)  # Adjust top margin if needed
+        audioLib_layout.setAlignment(Qt.AlignHCenter)  # Align the components in the middle of the horizontal axis
+
+        audioLib_frame = QFrame()
+        audioLib_frame.setStyleSheet("QFrame { border: 1px solid #82817e; border-radius: 4px; }")
+        audioLib_layout.addWidget(audioLib_frame)
+
+        audioLib_frame_layout = QHBoxLayout(audioLib_frame)
+        audioLib_frame_layout.setContentsMargins(10, 10, 10, 10)  # Adjust margins if needed
+
+        audioLib_button = QPushButton("Manage audio library", self)
+        audioLib_button.setFont(font)  # Apply the font
+        audioLib_frame_layout.addWidget(audioLib_button)
+
+        spacer = QSpacerItem(10, 10, QSizePolicy.Fixed, QSizePolicy.Minimum)  # Adjust the size policy to Fixed
+        audioLib_frame_layout.addItem(spacer)
+
+        hashtags_button = QPushButton("Manage hashtags", self)
+        hashtags_button.setFont(font)  # Apply the font
+        audioLib_frame_layout.addWidget(hashtags_button)
+
+        # Connect the button's clicked signal to the method
+        audioLib_button.clicked.connect(self.initialize_audioLib)
+        hashtags_button.clicked.connect(self.initialize_hashtags)
+
+        # Add a stretch item to make the border stretch
+        audioLib_frame_layout.addStretch()
+
+        layout.addLayout(audioLib_layout)
+
+
+
 
         self.setLayout(layout)
         self.show()
-
 
         # Audio class selection
         # dropdown
@@ -73,7 +111,6 @@ class AudioConfigWidget(QWidget):
 
         layout.addLayout(labels_layout)
 
-
         # Enable keyframes
         # Slider
         sliders_layout = QHBoxLayout()
@@ -87,7 +124,6 @@ class AudioConfigWidget(QWidget):
         sliders_layout.addWidget(switch_slider)
 
         layout.addLayout(sliders_layout)
-
 
         # Filter selection
         # Dropdown
@@ -105,8 +141,7 @@ class AudioConfigWidget(QWidget):
 
         layout.addLayout(filter_layout)
 
-
-        # Animation selection 
+        # Animation selection
         # Dropdown
         animation_layout = QHBoxLayout()
 
@@ -122,7 +157,6 @@ class AudioConfigWidget(QWidget):
 
         layout.addLayout(animation_layout)
 
-
         # Hook selection
         # Slider
         hook_layout = QHBoxLayout()
@@ -137,8 +171,7 @@ class AudioConfigWidget(QWidget):
 
         layout.addLayout(hook_layout)
 
-
-        # Overlays selection 
+        # Overlays selection
         # Dropdown
         overlays_layout = QHBoxLayout()
 
@@ -153,7 +186,6 @@ class AudioConfigWidget(QWidget):
         overlays_layout.addWidget(overlays_combo_box)
 
         layout.addLayout(overlays_layout)
-
 
         # CC filter selection
         red_box_layout = QHBoxLayout()
@@ -203,7 +235,6 @@ class AudioConfigWidget(QWidget):
 
         layout.addLayout(red_box_layout)
 
-
         # Save Button
         save_button = QPushButton('Save')
         save_button.setFont(font)  # Apply the font
@@ -224,7 +255,7 @@ class AudioConfigWidget(QWidget):
 
         # Add the save button to the layout
         layout.addWidget(save_button, alignment=Qt.AlignBottom)  # Align the save button to the bottom of the window
-    
+
         license_build_layout = QHBoxLayout()
         license_build_layout.setSpacing(0)  # Remove spacing between labels
 
@@ -262,6 +293,12 @@ class AudioConfigWidget(QWidget):
         self.setLayout(layout)
         self.show()
 
+    def initialize_audioLib(self):
+        print("Initializing audio library...")
+
+    def initialize_hashtags(self):
+        print("Initializing hashtags...")
+
     def save_config(self, profile, audio_class, enable_keyframes, selected_filter, selected_animation, enable_hook, selected_overlays, selected_cc_filter):
         config = {
             'audio_class': audio_class,
@@ -276,7 +313,7 @@ class AudioConfigWidget(QWidget):
             profiles = json.load(config_file)
             profiles[profile] = config
         with open('config.json', 'w') as config_file:
-            json.dump(profiles, config_file)
+            json.dump(profiles, config_file, indent=4)
         print('Configuration saved.')
 
 class SwitchSlider(QSlider):
@@ -319,6 +356,12 @@ class SwitchSlider(QSlider):
             self.setValue(not self.value())
         else:
             super().mousePressEvent(event)
+
+class AudioLib(QWidget):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle('Audio Library')
+        self.setGeometry(0, 0, 400, 300)
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
