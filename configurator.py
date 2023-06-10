@@ -211,7 +211,10 @@ class AudioConfigWidget(QWidget):
                                                             combo_box1.currentText(),
                                                             switch_slider.value(),
                                                             filter_combo_box.currentText(),
-                                                            animation_combo_box.currentText()))
+                                                            animation_combo_box.currentText(),
+                                                            hook_slider.value(),
+                                                            overlays_combo_box.currentText(),
+                                                            cc_filter_combo_box.currentText()))
 
         # Create a vertical spacer to push the save button to the bottom
         spacer = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
@@ -259,17 +262,20 @@ class AudioConfigWidget(QWidget):
         self.setLayout(layout)
         self.show()
 
-
-    def save_config(self, profile, audio_class, enable_keyframes, selected_filter, selected_animation):
+    def save_config(self, profile, audio_class, enable_keyframes, selected_filter, selected_animation, enable_hook, selected_overlays, selected_cc_filter):
         config = {
             'audio_class': audio_class,
             'enable_keyframes': enable_keyframes,
             'filter': selected_filter,
-            'animation': selected_animation
+            'animation': selected_animation,
+            'enable_hook': enable_hook,
+            'overlays': selected_overlays,
+            'cc_filter': selected_cc_filter
         }
-        with open('config.json', 'w') as config_file:
+        with open('config.json', 'r') as config_file:
             profiles = json.load(config_file)
             profiles[profile] = config
+        with open('config.json', 'w') as config_file:
             json.dump(profiles, config_file)
         print('Configuration saved.')
 
