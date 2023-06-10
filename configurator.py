@@ -1,8 +1,8 @@
 import sys
 import json
-from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QComboBox, QPushButton, QSlider
-from PyQt5.QtGui import QIcon, QFont
-from PyQt5.QtCore import Qt, QTimer
+from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QComboBox, QPushButton, QSlider, QFrame, QSpacerItem, QSizePolicy
+from PyQt5.QtGui import QIcon, QFont, QColor
+from PyQt5.QtCore import Qt
 
 class AudioConfigWidget(QWidget):
     def __init__(self):
@@ -11,9 +11,9 @@ class AudioConfigWidget(QWidget):
 
     def init_ui(self):
         self.setWindowTitle('Class configuration')
-        self.setWindowIcon(QIcon('assets\ga_logo_trans.png'))  # Set the window icon
+        self.setWindowIcon(QIcon('assets/ga_logo_trans.png'))  # Set the window icon
 
-        self.setGeometry(0, 0, 600, 400)  # Set initial window size
+        self.setGeometry(0, 0, 300, 500)  # Set initial window size
 
         # Set the window flags to make the widget topmost
         self.setWindowFlags(Qt.WindowStaysOnTopHint)
@@ -30,6 +30,35 @@ class AudioConfigWidget(QWidget):
         font = QFont()
         font.setPointSize(12)  # Increase the font size
 
+        profile_layout = QHBoxLayout()
+        profile_layout.setContentsMargins(0, 0, 0, 0)  # Adjust top margin if needed
+        profile_layout.setAlignment(Qt.AlignHCenter)  # Align the components in the middle of the horizontal axis
+
+        profile_frame = QFrame()
+        profile_frame.setStyleSheet("QFrame { border: 1px solid #82817e; border-radius: 4px; }")
+        profile_layout.addWidget(profile_frame)
+
+        profile_frame_layout = QHBoxLayout(profile_frame)
+        profile_frame_layout.setContentsMargins(76, 15, 76, 15)  # Adjust margins if needed
+
+        profile_label = QLabel('Profile Selection:')
+        profile_label.setStyleSheet("QLabel { border: none; }")  # Remove the border around the label text
+        profile_label.setFont(font)
+        profile_frame_layout.addWidget(profile_label)
+
+        profile_combo_box = QComboBox()
+        profile_combo_box.setSizeAdjustPolicy(QComboBox.AdjustToContents)  # Adjust the size policy to fit the contents
+        profile_combo_box.addItems(['Seamus magic formula', 'Luke belmar', 'Profile 3'])  # Add profile options
+        profile_frame_layout.addWidget(profile_combo_box)
+
+        layout.addLayout(profile_layout)
+
+        self.setLayout(layout)
+        self.show()
+
+
+        # Audio class selection
+        # dropdown
         labels_layout = QHBoxLayout()
 
         label1 = QLabel('Select audio class:')
@@ -44,6 +73,9 @@ class AudioConfigWidget(QWidget):
 
         layout.addLayout(labels_layout)
 
+
+        # Enable keyframes
+        # Slider
         sliders_layout = QHBoxLayout()
 
         label2 = QLabel('Enable keyframes:')
@@ -56,23 +88,189 @@ class AudioConfigWidget(QWidget):
 
         layout.addLayout(sliders_layout)
 
-        layout.addStretch()  # Add stretchable space
 
+        # Filter selection
+        # Dropdown
+        filter_layout = QHBoxLayout()
+
+        label3 = QLabel('Select filter:')
+        label3.setFont(font)  # Apply the font
+        filter_layout.addWidget(label3)
+
+        filter_classes = ['True', 'False', '4K']
+        filter_combo_box = QComboBox()
+        filter_combo_box.addItems(filter_classes)
+        filter_combo_box.setFixedWidth(100)  # Set the width of the dropdown
+        filter_layout.addWidget(filter_combo_box)
+
+        layout.addLayout(filter_layout)
+
+
+        # Animation selection 
+        # Dropdown
+        animation_layout = QHBoxLayout()
+
+        label4 = QLabel('Select animation:')
+        label4.setFont(font)  # Apply the font
+        animation_layout.addWidget(label4)
+
+        animation_classes = ['In', 'Out', 'None']
+        animation_combo_box = QComboBox()
+        animation_combo_box.addItems(animation_classes)
+        animation_combo_box.setFixedWidth(100)  # Set the width of the dropdown
+        animation_layout.addWidget(animation_combo_box)
+
+        layout.addLayout(animation_layout)
+
+
+        # Hook selection
+        # Slider
+        hook_layout = QHBoxLayout()
+
+        label5 = QLabel('Enable hook:')
+        label5.setFont(font)
+        hook_layout.addWidget(label5)
+
+        hook_slider = SwitchSlider()
+        hook_slider.setFixedWidth(100)
+        hook_layout.addWidget(hook_slider)
+
+        layout.addLayout(hook_layout)
+
+
+        # Overlays selection 
+        # Dropdown
+        overlays_layout = QHBoxLayout()
+
+        label6 = QLabel('Select overlays:')
+        label6.setFont(font)  # Apply the font
+        overlays_layout.addWidget(label6)
+
+        overlays_classes = ['Yes', 'No', 'Gaining']
+        overlays_combo_box = QComboBox()
+        overlays_combo_box.addItems(overlays_classes)
+        overlays_combo_box.setFixedWidth(100)  # Set the width of the dropdown
+        overlays_layout.addWidget(overlays_combo_box)
+
+        layout.addLayout(overlays_layout)
+
+
+        # CC filter selection
+        red_box_layout = QHBoxLayout()
+        red_box_layout.setSpacing(0)  # Remove spacing between red box and label
+
+        label7 = QLabel('Select CC filter:')
+        label7.setFont(font)  # Apply the font
+
+        cc_filter_classes = ['Grey orange', 'Love city', 'Serang', 'Dark silver', 'Quality 1']
+        cc_filter_combo_box = QComboBox()
+        cc_filter_combo_box.addItems(cc_filter_classes)
+        cc_filter_combo_box.setFixedWidth(100)  # Set the width of the dropdown
+
+        # Create the red box with "PRO" label
+        red_box = QFrame()
+        red_box.setObjectName("redBox")
+        red_box.setStyleSheet("QFrame#redBox { background-color: red; border-radius: 4px; }")
+        red_box.setFixedSize(30, 20)  # Adjust the size of the red box
+        red_box.setContentsMargins(0, 0, 0, 0)  # Remove margins
+
+        pro_label = QLabel('PRO')
+        pro_label.setObjectName("proLabel")
+        pro_label.setStyleSheet("""
+            QLabel#proLabel {
+                color: white;
+                font-size: 12px;
+                background-color: red;
+                padding: 1px;
+                border-radius: 2px;
+                position: absolute;
+                top: -8px;
+                right: -8px;
+            }
+        """)  # Apply CSS styling to position the label as an overlay with padding
+
+        pro_layout = QHBoxLayout(red_box)
+        pro_layout.addWidget(pro_label)
+        pro_layout.setContentsMargins(0, 0, 0, 0)  # Remove layout margins
+
+        red_box_layout.addWidget(label7)
+        red_box_layout.addWidget(red_box)
+
+        spacer = QSpacerItem(8, 20, QSizePolicy.Fixed, QSizePolicy.Minimum)
+        red_box_layout.addItem(spacer)
+
+        red_box_layout.addWidget(cc_filter_combo_box)
+
+        layout.addLayout(red_box_layout)
+
+
+        # Save Button
         save_button = QPushButton('Save')
         save_button.setFont(font)  # Apply the font
-        save_button.clicked.connect(lambda: self.save_config(combo_box1.currentText(), switch_slider.value()))
-        layout.addWidget(save_button, alignment=Qt.AlignBottom)  # Align the save button to the bottom
+        save_button.clicked.connect(lambda: self.save_config(profile_combo_box.currentText(),
+                                                            combo_box1.currentText(),
+                                                            switch_slider.value(),
+                                                            filter_combo_box.currentText(),
+                                                            animation_combo_box.currentText()))
+
+        # Create a vertical spacer to push the save button to the bottom
+        spacer = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+
+        # Add the spacer to the layout
+        layout.addItem(spacer)
+
+        # Add the save button to the layout
+        layout.addWidget(save_button, alignment=Qt.AlignBottom)  # Align the save button to the bottom of the window
+    
+        license_build_layout = QHBoxLayout()
+        license_build_layout.setSpacing(0)  # Remove spacing between labels
+
+        # Create a QVBoxLayout for license and build information
+        license_build_vlayout = QVBoxLayout()
+
+        license_label = QLabel('License status: Active')
+        license_font = QFont()
+        license_font.setPointSize(7)
+        license_label.setFont(license_font)
+        license_label.setContentsMargins(0, 0, 0, 0)  # Remove margins
+
+        # Set the color of the word "Active" to green
+        active_word_color = QColor('green')
+        license_text = license_label.text().replace('Active', '<font color="{}">Active</font>'.format(active_word_color.name()))
+        license_label.setText(license_text)
+
+        # Create the build label
+        build_label = QLabel('Build: 0.0.6')
+        build_label.setFont(license_font)
+        build_label.setContentsMargins(0, 0, 0, 0)  # Remove margins
+
+        # Add the build and license labels to the license_build_vlayout
+        license_build_vlayout.addWidget(build_label, alignment=Qt.AlignLeft)
+        license_build_vlayout.addWidget(license_label, alignment=Qt.AlignLeft)
+
+        # Add the license_build_vlayout to the license_build_layout
+        license_build_layout.addLayout(license_build_vlayout)
+
+        # Add the license_build_layout to the main layout
+        layout.addLayout(license_build_layout)
+
+        layout.addWidget(save_button, alignment=Qt.AlignBottom)  # Align the save button to the bottom of the window
 
         self.setLayout(layout)
         self.show()
 
-    def save_config(self, audio_class, enable_keyframes):
+
+    def save_config(self, profile, audio_class, enable_keyframes, selected_filter, selected_animation):
         config = {
             'audio_class': audio_class,
-            'enable_keyframes': enable_keyframes
+            'enable_keyframes': enable_keyframes,
+            'filter': selected_filter,
+            'animation': selected_animation
         }
         with open('config.json', 'w') as config_file:
-            json.dump(config, config_file)
+            profiles = json.load(config_file)
+            profiles[profile] = config
+            json.dump(profiles, config_file)
         print('Configuration saved.')
 
 class SwitchSlider(QSlider):
