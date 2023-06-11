@@ -291,36 +291,10 @@ class AudioConfigWidget(QWidget):
         text_animation_size.setFont(font)
         text_animation_layout.addWidget(text_animation_size)
         self.text_animation_combo_box = QComboBox()
-        self.text_animation_combo_box.addItems(['Animation in', 'Caption'])
+        self.text_animation_combo_box.addItems(['CAP: Shimmer + neg_glow', 'CAP: Ripple II', 'CAP: Ripple III', 'CAP: Spring', 'CAP: Word by word', 'ANI: Bounce in_0.2s'])
         self.text_animation_combo_box.setFixedWidth(125)
         text_animation_layout.addWidget(self.text_animation_combo_box)
         new_section_layout.addLayout(text_animation_layout)
-
-        # If caption selection
-        if_caption_text_layout = QHBoxLayout()
-        if_caption_text_layout.setSpacing(0)
-        if_caption_text_size = QLabel('If caption:')
-        if_caption_text_size.setStyleSheet("QLabel { border: none; }")
-        if_caption_text_size.setFont(font)
-        if_caption_text_layout.addWidget(if_caption_text_size)
-        self.if_caption_text_combo_box = QComboBox()
-        self.if_caption_text_combo_box.addItems(['Shimmer + neg_glow', 'Ripple II', 'Ripple III', 'Spring', 'Word by word'])
-        self.if_caption_text_combo_box.setFixedWidth(125)
-        if_caption_text_layout.addWidget(self.if_caption_text_combo_box)
-        new_section_layout.addLayout(if_caption_text_layout)
-
-        # If animation selection
-        if_animation_text_layout = QHBoxLayout()
-        if_animation_text_layout.setSpacing(0)
-        if_animation_text_size = QLabel('If animation:')
-        if_animation_text_size.setStyleSheet("QLabel { border: none; }")
-        if_animation_text_size.setFont(font)
-        if_animation_text_layout.addWidget(if_animation_text_size)
-        self.if_animation_text_combo_box = QComboBox()
-        self.if_animation_text_combo_box.addItems(['Bounce in_0.2s'])
-        self.if_animation_text_combo_box.setFixedWidth(125)
-        if_animation_text_layout.addWidget(self.if_animation_text_combo_box)
-        new_section_layout.addLayout(if_animation_text_layout)
 
         # Overlay animation IN selection
         overlay_animation_in_text_layout = QHBoxLayout()
@@ -440,8 +414,6 @@ class AudioConfigWidget(QWidget):
             'text_outline': self.text_outline_combo_box.currentText(),
             'text_glow': self.text_glow_combo_box.currentText(),
             'animation_text': self.text_animation_combo_box.currentText(),
-            'caption_if': self.if_caption_text_combo_box.currentText(),
-            'animation_if': self.if_animation_text_combo_box.currentText(),
             'overlay_animation_in': self.overlay_animation_in_text_combo_box.currentText(),
             'stroke_size': self.stroke_size_combo_box.currentText(),
             'caption': self.caption_combo_box.currentText() 

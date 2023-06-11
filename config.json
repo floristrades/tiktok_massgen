@@ -13,9 +13,7 @@
         "text_font": "No fonts found",
         "text_outline": "First option",
         "text_glow": "Yes",
-        "animation_text": "Animation in",
-        "caption_if": "Shimmer + neg_flow",
-        "animation_if": "Bounce in_0.2s",
+        "animation_text": "ANI: Bounce in_0.2s",
         "overlay_animation_in": "Unfold",
         "stroke_size": "35",
         "caption": "Yes"
