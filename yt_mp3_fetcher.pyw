@@ -2,10 +2,19 @@ import os
 import json
 from PyQt5 import QtCore, QtGui, QtWidgets
 from pytube import YouTube
+import sys
 
 class MainWindow(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
+
+        # Calculate the position for the window
+        screen_geometry = QtWidgets.QDesktopWidget().screenGeometry()
+        window_geometry = self.frameGeometry()
+        window_geometry.moveCenter(screen_geometry.center())
+        window_geometry.moveLeft(window_geometry.left() - 600)
+        self.move(window_geometry.topLeft())
+
         self.setWindowTitle("YouTube Audio Downloader")
         self.resize(400, 200)
 
@@ -30,6 +39,13 @@ class MainWindow(QtWidgets.QMainWindow):
         self.status_label.setGeometry(QtCore.QRect(20, 160, 360, 30))
 
     def populate_audio_classes(self):
+        # Check if the JSON file exists
+        if not os.path.exists("audio_classes.json"):
+            # Create the JSON file with default values
+            audio_classes = ['Conspiracy', 'Sad', 'Inspirational', 'Monotone', 'Intriguing']
+            with open("audio_classes.json", "w") as file:
+                json.dump(audio_classes, file)
+
         # Read the class names from the JSON file
         with open("audio_classes.json", "r") as file:
             audio_classes = json.load(file)
@@ -49,14 +65,7 @@ class MainWindow(QtWidgets.QMainWindow):
         try:
             # Create a YouTube object with the provided video URL
             yt = YouTube(video_url)
-
-            # Set the audio quality based on the selected class
-            if audio_class == "High":
-                audio = yt.streams.filter(only_audio=True).first()
-            elif audio_class == "Medium":
-                audio = yt.streams.filter(only_audio=True).filter(abr="128kbps").first()
-            else:
-                audio = yt.streams.filter(only_audio=True).filter(abr="64kbps").first()
+            audio = yt.streams.filter(only_audio=True).first()
 
             # Download the audio in mp3 format
             audio.download(directory)
@@ -75,4 +84,4 @@ if __name__ == "__main__":
     app = QtWidgets.QApplication([])
     window = MainWindow()
     window.show()
-    app.exec_()
+    sys.exit(app.exec_())

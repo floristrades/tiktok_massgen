@@ -1,4 +1,6 @@
 import sys
+import os
+import subprocess
 import json
 from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QComboBox, QPushButton, QSlider, QFrame, QSpacerItem, QSizePolicy
 from PyQt5.QtGui import QIcon, QFont, QColor
@@ -387,6 +389,8 @@ class AudioConfigWidget(QWidget):
 
     def initialize_audioLib(self):
         print("Initializing audio library...")
+        file_path = os.path.abspath("yt_mp3_fetcher.pyw")
+        subprocess.call(["start", file_path], shell=True)
 
     def initialize_hashtags(self):
         print("Initializing hashtags...")
