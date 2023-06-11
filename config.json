@@ -1,29 +1,23 @@
 {
-    "Seamus magic formula": {
-        "audio_class": "Conspiracy",
-        "enable_keyframes": true,
-        "filter": "True",
-        "animation": "In",
-        "enable_hook": false,
-        "overlays": "Yes",
-        "cc_filter": "Grey orange"
-    },
-    "Luke belmar": {
+    "Seamus": {
         "audio_class": "Conspiracy",
         "enable_keyframes": false,
         "filter": "True",
-        "animation": "In",
+        "animation_in_type": "In",
+        "animation_in_timer": "0.2",
         "enable_hook": false,
         "overlays": "Yes",
-        "cc_filter": "Grey orange"
-    },
-    "Profile 3": {
-        "audio_class": "Conspiracy",
-        "enable_keyframes": false,
-        "filter": "True",
-        "animation": "In",
-        "enable_hook": false,
-        "overlays": "Yes",
-        "cc_filter": "Grey orange"
+        "cc_filter": "Grey orange",
+        "auto_gen_text": "Yes",
+        "highlighted_text_colour": "Yellow",
+        "text_font": "No fonts found",
+        "text_outline": "First option",
+        "text_glow": "Yes",
+        "animation_text": "Animation in",
+        "caption_if": "Shimmer + neg_flow",
+        "animation_if": "Bounce in_0.2s",
+        "overlay_animation_in": "Unfold",
+        "stroke_size": "35",
+        "caption": "Yes"
     }
 }

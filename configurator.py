@@ -3,7 +3,8 @@ import json
 from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QComboBox, QPushButton, QSlider, QFrame, QSpacerItem, QSizePolicy
 from PyQt5.QtGui import QIcon, QFont, QColor
 from PyQt5.QtCore import Qt
-
+from functools import partial
+ 
 class AudioConfigWidget(QWidget):
     def __init__(self):
         super().__init__()
@@ -12,10 +13,7 @@ class AudioConfigWidget(QWidget):
     def init_ui(self):
         self.setWindowTitle('Class configuration')
         self.setWindowIcon(QIcon('assets/ga_logo_trans.png'))  # Set the window icon
-
         self.setGeometry(0, 0, 400, 700)  # Set initial window size
-
-        # Set the window flags to make the widget topmost
         self.setWindowFlags(Qt.WindowStaysOnTopHint)
 
         # Center the window on the screen
@@ -26,175 +24,146 @@ class AudioConfigWidget(QWidget):
 
         layout = QVBoxLayout()
         layout.setAlignment(Qt.AlignTop)
-
         font = QFont()
         font.setPointSize(12)  # Increase the font size
-
-        library_vlayout = QVBoxLayout()
-
+        
         profile_layout = QHBoxLayout()
         profile_layout.setContentsMargins(0, 0, 0, 0)  # Adjust top margin if needed
         profile_layout.setAlignment(Qt.AlignHCenter)  # Align the components in the middle of the horizontal axis
-
         profile_frame = QFrame()
         profile_frame.setStyleSheet("QFrame { border: 1px solid #82817e; border-radius: 8px; }")
         profile_layout.addWidget(profile_frame)
-
         profile_frame_layout = QHBoxLayout(profile_frame)
         profile_frame_layout.setContentsMargins(95, 15, 95, 15)  # Adjust margins if needed
-
         profile_label = QLabel('Profile Selection:')
-        profile_label.setStyleSheet("QLabel { border: none; }")  # Remove the border around the label text
+        profile_label.setStyleSheet("QLabel { font-weight: bold; font-size: 16px; }")  # Remove the border around the label text
         profile_label.setFont(font)
         profile_frame_layout.addWidget(profile_label)
-
-        profile_combo_box = QComboBox()
-        profile_combo_box.setSizeAdjustPolicy(QComboBox.AdjustToContents)  # Adjust the size policy to fit the contents
-        profile_combo_box.addItems(['Seamus magic formula', 'Luke belmar', 'Profile 3'])  # Add profile options
-        profile_frame_layout.addWidget(profile_combo_box)
+        self.profile_combo_box = QComboBox()
+        self.profile_combo_box.setSizeAdjustPolicy(QComboBox.AdjustToContents)  # Adjust the size policy to fit the contents
+        self.profile_combo_box.addItems(['Seamus', 'Luke belmar', 'Profile 3', 'Profile 4', 'Profile 5', 'Profile 6', 'Profile 7', 'Profile 8', 'Profile 9', 'Profile 10', 'Profile 11', 'Profile 12', 'Profile 13', 'Profile 14', 'Profile 15', 'Profile 16', 'Profile 17', 'Profile 18', 'Profile 19', 'Profile 20'])  # Add profile options
+        self.profile_combo_box.setStyleSheet("QComboBox { font-size: 14px; }")
+        profile_frame_layout.addWidget(self.profile_combo_box)
+        
 
         # Add a stretch item to make the border stretch
         profile_frame_layout.addStretch()
 
         layout.addLayout(profile_layout)
 
+        # Manage audio library button, create layout
         audioLib_layout = QHBoxLayout()
-        audioLib_layout.setContentsMargins(0, 0, 0, 0)  # Adjust top margin if needed
         audioLib_layout.setAlignment(Qt.AlignHCenter)  # Align the components in the middle of the horizontal axis
-
         audioLib_frame = QFrame()
         audioLib_frame.setStyleSheet("QFrame { border: 1px solid #82817e; border-radius: 8px; }")
         audioLib_layout.addWidget(audioLib_frame)
-
         audioLib_frame_layout = QHBoxLayout(audioLib_frame)
-        audioLib_frame_layout.setContentsMargins(10, 10, 10, 10)  # Adjust margins if needed
-
         audioLib_button = QPushButton("Manage audio library", self)
         audioLib_button.setFont(font)  # Apply the font
         audioLib_frame_layout.addWidget(audioLib_button)
 
-        spacer = QSpacerItem(10, 10, QSizePolicy.Fixed, QSizePolicy.Minimum)  # Adjust the size policy to Fixed
-        audioLib_frame_layout.addItem(spacer)
-
+        # Manage hashtags button
         hashtags_button = QPushButton("Manage hashtags", self)
         hashtags_button.setFont(font)  # Apply the font
         audioLib_frame_layout.addWidget(hashtags_button)
-
         # Connect the button's clicked signal to the method
         audioLib_button.clicked.connect(self.initialize_audioLib)
         hashtags_button.clicked.connect(self.initialize_hashtags)
-
         # Add a stretch item to make the border stretch
         audioLib_frame_layout.addStretch()
-
         layout.addLayout(audioLib_layout)
-
         self.setLayout(layout)
         self.show()
 
         # Audio class selection
-        # dropdown
-        labels_layout = QHBoxLayout()
-
-        label1 = QLabel('Select audio class:')
-        label1.setFont(font)  # Apply the font
-        labels_layout.addWidget(label1)
-
+        audio_label_layout = QHBoxLayout()
+        audio_label = QLabel('Select audio class:')
+        audio_label.setFont(font)  # Apply the font
+        audio_label_layout.addWidget(audio_label)
         audio_classes = ['Conspiracy', 'Sad', 'Inspirational', 'Monotone', 'Intriguing']
-        combo_box1 = QComboBox()
-        combo_box1.addItems(audio_classes)
-        combo_box1.setFixedWidth(100)  # Set the width of the dropdown
-        labels_layout.addWidget(combo_box1)
-
-        layout.addLayout(labels_layout)
+        self.audio_class_box = QComboBox()
+        self.audio_class_box.addItems(audio_classes)
+        self.audio_class_box.setFixedWidth(125)  # Set the width of the dropdown
+        audio_label_layout.addWidget(self.audio_class_box)
+        layout.addLayout(audio_label_layout)
 
         # Enable keyframes
-        # Slider
-        sliders_layout = QHBoxLayout()
-
-        label2 = QLabel('Enable keyframes:')
-        label2.setFont(font)  # Apply the font
-        sliders_layout.addWidget(label2)
-
-        switch_slider = SwitchSlider()
-        switch_slider.setFixedWidth(100)  # Set the width of the slider
-        sliders_layout.addWidget(switch_slider)
-
-        layout.addLayout(sliders_layout)
+        keyframes_layout = QHBoxLayout()
+        keyframes_label = QLabel('Enable keyframes:')
+        keyframes_label.setFont(font)  # Apply the font
+        keyframes_layout.addWidget(keyframes_label)
+        self.keyframes_slider = SwitchSlider()
+        self.keyframes_slider.setFixedWidth(125)  # Set the width of the slider
+        keyframes_layout.addWidget(self.keyframes_slider)
+        layout.addLayout(keyframes_layout)
 
         # Filter selection
-        # Dropdown
         filter_layout = QHBoxLayout()
-
-        label3 = QLabel('Select filter:')
-        label3.setFont(font)  # Apply the font
-        filter_layout.addWidget(label3)
-
+        filter_label = QLabel('Select filter:')
+        filter_label.setFont(font)  # Apply the font
+        filter_layout.addWidget(filter_label)
         filter_classes = ['True', 'False', '4K']
-        filter_combo_box = QComboBox()
-        filter_combo_box.addItems(filter_classes)
-        filter_combo_box.setFixedWidth(100)  # Set the width of the dropdown
-        filter_layout.addWidget(filter_combo_box)
-
+        self.filter_combo_box = QComboBox()
+        self.filter_combo_box.addItems(filter_classes)
+        self.filter_combo_box.setFixedWidth(125)  # Set the width of the dropdown
+        filter_layout.addWidget(self.filter_combo_box)
         layout.addLayout(filter_layout)
 
-        # Animation selection
-        # Dropdown
-        animation_layout = QHBoxLayout()
+        # Animation IN type selection
+        animation_in_layout = QHBoxLayout()
+        animation_in_label = QLabel('Select animation IN type:')
+        animation_in_label.setFont(font)  # Apply the font
+        animation_in_layout.addWidget(animation_in_label)
+        animation_in_classes = ['In', 'Out', 'None']
+        self.animation_in_combo_box = QComboBox()
+        self.animation_in_combo_box.addItems(animation_in_classes)
+        self.animation_in_combo_box.setFixedWidth(125)  # Set the width of the dropdown
+        animation_in_layout.addWidget(self.animation_in_combo_box)
+        layout.addLayout(animation_in_layout)
 
-        label4 = QLabel('Select animation:')
-        label4.setFont(font)  # Apply the font
-        animation_layout.addWidget(label4)
-
-        animation_classes = ['In', 'Out', 'None']
-        animation_combo_box = QComboBox()
-        animation_combo_box.addItems(animation_classes)
-        animation_combo_box.setFixedWidth(100)  # Set the width of the dropdown
-        animation_layout.addWidget(animation_combo_box)
-
-        layout.addLayout(animation_layout)
+        # Animation IN timer selection
+        animation_in_tmr_layout = QHBoxLayout()
+        animation_in_tmr_label = QLabel('Select animation IN timer:')
+        animation_in_tmr_label.setFont(font)  # Apply the font
+        animation_in_tmr_layout.addWidget(animation_in_tmr_label)
+        animation_classes = ['0.2', '0.3', '0.4']
+        self.animation_in_tmr_combo_box = QComboBox()
+        self.animation_in_tmr_combo_box.addItems(animation_classes)
+        self.animation_in_tmr_combo_box.setFixedWidth(125)  # Set the width of the dropdown
+        animation_in_tmr_layout.addWidget(self.animation_in_tmr_combo_box)
+        layout.addLayout(animation_in_tmr_layout)
 
         # Hook selection
-        # Slider
         hook_layout = QHBoxLayout()
-
-        label5 = QLabel('Enable hook:')
-        label5.setFont(font)
-        hook_layout.addWidget(label5)
-
-        hook_slider = SwitchSlider()
-        hook_slider.setFixedWidth(100)
-        hook_layout.addWidget(hook_slider)
-
+        hook_label = QLabel('Enable hook:')
+        hook_label.setFont(font)
+        hook_layout.addWidget(hook_label)
+        self.hook_slider = SwitchSlider()
+        self.hook_slider.setFixedWidth(125)
+        hook_layout.addWidget(self.hook_slider)
         layout.addLayout(hook_layout)
 
         # Overlays selection
-        # Dropdown
         overlays_layout = QHBoxLayout()
-
-        label6 = QLabel('Select overlays:')
-        label6.setFont(font)  # Apply the font
-        overlays_layout.addWidget(label6)
-
+        overlays_label = QLabel('Select overlays:')
+        overlays_label.setFont(font)  # Apply the font
+        overlays_layout.addWidget(overlays_label)
         overlays_classes = ['Yes', 'No', 'Gaining']
-        overlays_combo_box = QComboBox()
-        overlays_combo_box.addItems(overlays_classes)
-        overlays_combo_box.setFixedWidth(100)  # Set the width of the dropdown
-        overlays_layout.addWidget(overlays_combo_box)
-
+        self.overlays_combo_box = QComboBox()
+        self.overlays_combo_box.addItems(overlays_classes)
+        self.overlays_combo_box.setFixedWidth(125)  # Set the width of the dropdown
+        overlays_layout.addWidget(self.overlays_combo_box)
         layout.addLayout(overlays_layout)
 
         # CC filter selection
         cc_filter_layout = QHBoxLayout()
         cc_filter_layout.setSpacing(0)  # Remove spacing between labels
-
-        label7 = QLabel('Select CC filter:')
-        label7.setFont(font)  # Apply the font
-
+        cc_filter_label = QLabel('Select CC filter:')
+        cc_filter_label.setFont(font)  # Apply the font
         cc_filter_classes = ['Grey orange', 'Love city', 'Serang', 'Dark silver', 'Quality 1']
-        cc_filter_combo_box = QComboBox()
-        cc_filter_combo_box.addItems(cc_filter_classes)
-        cc_filter_combo_box.setFixedWidth(100)  # Set the width of the dropdown
+        self.cc_filter_combo_box = QComboBox()
+        self.cc_filter_combo_box.addItems(cc_filter_classes)
+        self.cc_filter_combo_box.setFixedWidth(125)  # Set the width of the dropdown
 
         # Create the red box with "PRO" label
         red_box = QFrame()
@@ -221,16 +190,11 @@ class AudioConfigWidget(QWidget):
         pro_layout = QHBoxLayout(red_box)
         pro_layout.addWidget(pro_label)
         pro_layout.setContentsMargins(0, 0, 0, 0)  # Remove layout margins
-
-        cc_filter_layout.addWidget(label7)
+        cc_filter_layout.addWidget(cc_filter_label)
         cc_filter_layout.addWidget(red_box)
-
         spacer = QSpacerItem(8, 20, QSizePolicy.Fixed, QSizePolicy.Minimum)
         cc_filter_layout.addItem(spacer)
-
-        cc_filter_layout.addWidget(cc_filter_combo_box)
-
-        # Add cc_filter_layout to the main layout
+        cc_filter_layout.addWidget(self.cc_filter_combo_box)
         layout.addLayout(cc_filter_layout)
 
         # Create a new section frame with styling
@@ -241,38 +205,135 @@ class AudioConfigWidget(QWidget):
         new_section_layout = QVBoxLayout()
         new_section_layout.setSpacing(10)  # Adjust spacing between the new section components
 
+        # Title header
+        title_header_layout = QHBoxLayout()
+        title_header_layout.setContentsMargins(0, 3, 0, 10)  # Adjust margins as needed
+        title_label = QLabel("Text settings")
+        title_label.setStyleSheet("QLabel { border: 1px solid #82817e; border-radius: 8px;font-weight: bold; font-size: 16px; }")  # Adjust font styling as needed
+        title_header_layout.addWidget(title_label, alignment=Qt.AlignCenter)
+
+        new_section_layout.addLayout(title_header_layout)
+
         # Auto-generated text selection
         auto_generated_layout = QHBoxLayout()
         auto_generated_layout.setSpacing(0)  # Remove spacing between labels
         label_auto_generated = QLabel('Auto-generated text:')
-         # Removes indiv borders
         label_auto_generated.setStyleSheet("QLabel { border: none; }")
         label_auto_generated.setFont(font)
         auto_generated_layout.addWidget(label_auto_generated)
-        auto_generated_combo_box = QComboBox()
-        auto_generated_combo_box.addItems(['Yes', 'No'])
-        auto_generated_combo_box.setFixedWidth(100)
-        auto_generated_layout.addWidget(auto_generated_combo_box)
-
+        self.auto_generated_combo_box = QComboBox()
+        self.auto_generated_combo_box.addItems(['Yes', 'No'])
+        self.auto_generated_combo_box.setFixedWidth(125)
+        auto_generated_layout.addWidget(self.auto_generated_combo_box)
         new_section_layout.addLayout(auto_generated_layout)
 
-        # Text color selection
-        text_color_layout = QHBoxLayout()
-        text_color_layout.setSpacing(0)
-        label_text_color = QLabel('Colour:')
-        label_text_color.setStyleSheet("QLabel { border: none; }")
-        label_text_color.setFont(font)
-        text_color_layout.addWidget(label_text_color)
-        text_color_combo_box = QComboBox()
-        text_color_combo_box.addItems(['Red', 'Blue', 'Green'])
-        text_color_combo_box.setFixedWidth(100)
-        
-        text_color_layout.addWidget(text_color_combo_box)
-        new_section_layout.addLayout(text_color_layout)
+        # Highlight text color selection
+        highlight_text_color_layout = QHBoxLayout()
+        highlight_text_color_layout.setSpacing(0)
+        highlight_label_text_color = QLabel('Highlighted text colour:')
+        highlight_label_text_color.setStyleSheet("QLabel { border: none; }")
+        highlight_label_text_color.setFont(font)
+        highlight_text_color_layout.addWidget(highlight_label_text_color)
+        self.highlight_text_color_combo_box = QComboBox()
+        self.highlight_text_color_combo_box.addItems(['Yellow', 'Red', 'Turquoise'])
+        self.highlight_text_color_combo_box.setFixedWidth(125)
+        highlight_text_color_layout.addWidget(self.highlight_text_color_combo_box)
+        new_section_layout.addLayout(highlight_text_color_layout)
 
         # Add the section frame to the new section layout
         section_frame.setLayout(new_section_layout)
         layout.addWidget(section_frame)
+
+        # Text font selection
+        font_layout = QHBoxLayout()
+        font_layout.setSpacing(0)
+        font_label_size = QLabel('Text font:')
+        font_label_size.setStyleSheet("QLabel { border: none; }")
+        font_label_size.setFont(font)
+        font_layout.addWidget(font_label_size)
+        self.font_combo_box = QComboBox()
+        self.font_combo_box.addItems(['No fonts found'])
+        self.font_combo_box.setFixedWidth(125)
+        font_layout.addWidget(self.font_combo_box)
+        new_section_layout.addLayout(font_layout)
+
+        # Text outline selection
+        text_outline_layout = QHBoxLayout()
+        text_outline_layout.setSpacing(0)
+        text_outline_size = QLabel('Text outline:')
+        text_outline_size.setStyleSheet("QLabel { border: none; }")
+        text_outline_size.setFont(font)
+        text_outline_layout.addWidget(text_outline_size)
+        self.text_outline_combo_box = QComboBox()
+        self.text_outline_combo_box.addItems(['First option'])
+        self.text_outline_combo_box.setFixedWidth(125)
+        text_outline_layout.addWidget(self.text_outline_combo_box)
+        new_section_layout.addLayout(text_outline_layout)
+
+        # Text glow selection
+        text_glow_layout = QHBoxLayout()
+        text_glow_layout.setSpacing(0)
+        text_glow_size = QLabel('Text glow:')
+        text_glow_size.setStyleSheet("QLabel { border: none; }")
+        text_glow_size.setFont(font)
+        text_glow_layout.addWidget(text_glow_size)
+        self.text_glow_combo_box = QComboBox()
+        self.text_glow_combo_box.addItems(['Yes', 'No', 'Pro'])
+        self.text_glow_combo_box.setFixedWidth(125)
+        text_glow_layout.addWidget(self.text_glow_combo_box)
+        new_section_layout.addLayout(text_glow_layout)
+
+        # Text animation selection
+        text_animation_layout = QHBoxLayout()
+        text_animation_layout.setSpacing(0)
+        text_animation_size = QLabel('Animation for text:')
+        text_animation_size.setStyleSheet("QLabel { border: none; }")
+        text_animation_size.setFont(font)
+        text_animation_layout.addWidget(text_animation_size)
+        self.text_animation_combo_box = QComboBox()
+        self.text_animation_combo_box.addItems(['Animation in', 'Caption'])
+        self.text_animation_combo_box.setFixedWidth(125)
+        text_animation_layout.addWidget(self.text_animation_combo_box)
+        new_section_layout.addLayout(text_animation_layout)
+
+        # If caption selection
+        if_caption_text_layout = QHBoxLayout()
+        if_caption_text_layout.setSpacing(0)
+        if_caption_text_size = QLabel('If caption:')
+        if_caption_text_size.setStyleSheet("QLabel { border: none; }")
+        if_caption_text_size.setFont(font)
+        if_caption_text_layout.addWidget(if_caption_text_size)
+        self.if_caption_text_combo_box = QComboBox()
+        self.if_caption_text_combo_box.addItems(['Shimmer + neg_glow', 'Ripple II', 'Ripple III', 'Spring', 'Word by word'])
+        self.if_caption_text_combo_box.setFixedWidth(125)
+        if_caption_text_layout.addWidget(self.if_caption_text_combo_box)
+        new_section_layout.addLayout(if_caption_text_layout)
+
+        # If animation selection
+        if_animation_text_layout = QHBoxLayout()
+        if_animation_text_layout.setSpacing(0)
+        if_animation_text_size = QLabel('If animation:')
+        if_animation_text_size.setStyleSheet("QLabel { border: none; }")
+        if_animation_text_size.setFont(font)
+        if_animation_text_layout.addWidget(if_animation_text_size)
+        self.if_animation_text_combo_box = QComboBox()
+        self.if_animation_text_combo_box.addItems(['Bounce in_0.2s'])
+        self.if_animation_text_combo_box.setFixedWidth(125)
+        if_animation_text_layout.addWidget(self.if_animation_text_combo_box)
+        new_section_layout.addLayout(if_animation_text_layout)
+
+        # Overlay animation IN selection
+        overlay_animation_in_text_layout = QHBoxLayout()
+        overlay_animation_in_text_layout.setSpacing(0)
+        overlay_animation_in_text_size = QLabel('Overlay animation IN:')
+        overlay_animation_in_text_size.setStyleSheet("QLabel { border: none; }")
+        overlay_animation_in_text_size.setFont(font)
+        overlay_animation_in_text_layout.addWidget(overlay_animation_in_text_size)
+        self.overlay_animation_in_text_combo_box = QComboBox()
+        self.overlay_animation_in_text_combo_box.addItems(['Unfold', 'Shake 3', 'Rock vertical', 'Rock horizontal', 'Zoom 1', 'Zoom 2'])
+        self.overlay_animation_in_text_combo_box.setFixedWidth(125)
+        overlay_animation_in_text_layout.addWidget(self.overlay_animation_in_text_combo_box)
+        new_section_layout.addLayout(overlay_animation_in_text_layout)
 
         # Stroke size selection
         stroke_size_layout = QHBoxLayout()
@@ -281,26 +342,11 @@ class AudioConfigWidget(QWidget):
         label_stroke_size.setStyleSheet("QLabel { border: none; }")
         label_stroke_size.setFont(font)
         stroke_size_layout.addWidget(label_stroke_size)
-        stroke_size_combo_box = QComboBox()
-        stroke_size_combo_box.addItems(['Small', 'Medium', 'Large'])
-        stroke_size_combo_box.setFixedWidth(100)
-        stroke_size_layout.addWidget(stroke_size_combo_box)
-
+        self.stroke_size_combo_box = QComboBox()
+        self.stroke_size_combo_box.addItems(['35'])
+        self.stroke_size_combo_box.setFixedWidth(125)
+        stroke_size_layout.addWidget(self.stroke_size_combo_box)
         new_section_layout.addLayout(stroke_size_layout)
-
-        # Text animation selection
-        text_animation_layout = QHBoxLayout()
-        text_animation_layout.setSpacing(0)
-        text_label_animation = QLabel('Animation:')
-        text_label_animation.setStyleSheet("QLabel { border: none; }")
-        text_label_animation.setFont(font)
-        text_animation_layout.addWidget(text_label_animation)
-        text_animation_combo_box = QComboBox()
-        text_animation_combo_box.addItems(['Fade', 'Slide', 'Zoom'])
-        text_animation_combo_box.setFixedWidth(100)
-        text_animation_layout.addWidget(text_animation_combo_box)
-
-        new_section_layout.addLayout(text_animation_layout)
 
         # Caption selection
         caption_layout = QHBoxLayout()
@@ -309,95 +355,11 @@ class AudioConfigWidget(QWidget):
         label_caption.setStyleSheet("QLabel { border: none; }")
         label_caption.setFont(font)
         caption_layout.addWidget(label_caption)
-        caption_combo_box = QComboBox()
-        caption_combo_box.addItems(['Yes', 'No'])
-        caption_combo_box.setFixedWidth(100)
-        caption_layout.addWidget(caption_combo_box)
-
+        self.caption_combo_box = QComboBox()
+        self.caption_combo_box.addItems(['Yes', 'No'])
+        self.caption_combo_box.setFixedWidth(125)
+        caption_layout.addWidget(self.caption_combo_box)
         new_section_layout.addLayout(caption_layout)
-
-        # Caption when yes selection
-        caption_yes_layout = QHBoxLayout()
-        caption_yes_layout.setSpacing(0)
-        label_caption_yes = QLabel('Caption when yes:')
-        label_caption_yes.setStyleSheet("QLabel { border: none; }")
-        label_caption_yes.setFont(font)
-        caption_yes_layout.addWidget(label_caption_yes)
-        caption_yes_combo_box = QComboBox()
-        caption_yes_combo_box.addItems(['Option 1', 'Option 2', 'Option 3'])
-        caption_yes_combo_box.setFixedWidth(100)
-        caption_yes_layout.addWidget(caption_yes_combo_box)
-
-        new_section_layout.addLayout(caption_yes_layout)
-
-        # Animation in selection
-        animation_in_layout = QHBoxLayout()
-        animation_in_layout.setSpacing(0)
-        label_animation_in = QLabel('Animation in:')
-        label_animation_in.setStyleSheet("QLabel { border: none; }")
-        label_animation_in.setFont(font)
-        animation_in_layout.addWidget(label_animation_in)
-        animation_in_combo_box = QComboBox()
-        animation_in_combo_box.addItems(['Option 1', 'Option 2', 'Option 3'])
-        animation_in_combo_box.setFixedWidth(100)
-        animation_in_layout.addWidget(animation_in_combo_box)
-
-        new_section_layout.addLayout(animation_in_layout)
-
-        # Animation when yes selection
-        animation_yes_layout = QHBoxLayout()
-        animation_yes_layout.setSpacing(0)
-        label_animation_yes = QLabel('Animation when yes:')
-        label_animation_yes.setStyleSheet("QLabel { border: none; }")
-        label_animation_yes.setFont(font)
-        animation_yes_layout.addWidget(label_animation_yes)
-        animation_yes_combo_box = QComboBox()
-        animation_yes_combo_box.addItems(['Option 1', 'Option 2', 'Option 3'])
-        animation_yes_combo_box.setFixedWidth(100)
-        animation_yes_layout.addWidget(animation_yes_combo_box)
-
-        new_section_layout.addLayout(animation_yes_layout)
-
-        # Text font selection
-        text_font_layout = QHBoxLayout()
-        text_font_layout.setSpacing(0)
-        label_text_font = QLabel('Font:')
-        label_text_font.setStyleSheet("QLabel { border: none; }")
-        label_text_font.setFont(font)
-        text_font_layout.addWidget(label_text_font)
-        text_font_combo_box = QComboBox()
-        text_font_combo_box.addItems(['Font 1', 'Font 2', 'Font 3'])
-        text_font_combo_box.setFixedWidth(100)
-        text_font_layout.addWidget(text_font_combo_box)
-
-        new_section_layout.addLayout(text_font_layout)
-
-        # Text glow selection
-        text_glow_layout = QHBoxLayout()
-        text_glow_layout.setSpacing(0)
-        label_text_glow = QLabel('Text glow:')
-        label_text_glow.setStyleSheet("QLabel { border: none; }")
-        label_text_glow.setFont(font)
-        text_glow_layout.addWidget(label_text_glow)
-        text_glow_slider = SwitchSlider()
-        text_glow_slider.setFixedWidth(100)
-        text_glow_layout.addWidget(text_glow_slider)
-
-        new_section_layout.addLayout(text_glow_layout)
-
-        # Text glow color selection
-        text_glow_color_layout = QHBoxLayout()
-        text_glow_color_layout.setSpacing(0)
-        label_text_glow_color = QLabel('Text glow colour:')
-        label_text_glow_color.setStyleSheet("QLabel { border: none; }")
-        label_text_glow_color.setFont(font)
-        text_glow_color_layout.addWidget(label_text_glow_color)
-        text_glow_color_combo_box = QComboBox()
-        text_glow_color_combo_box.addItems(['Color 1', 'Color 2', 'Color 3'])
-        text_glow_color_combo_box.setFixedWidth(100)
-        text_glow_color_layout.addWidget(text_glow_color_combo_box)
-
-        new_section_layout.addLayout(text_glow_color_layout)
 
         # Add the new section layout to the main layout
         layout.addLayout(new_section_layout)
@@ -405,34 +367,19 @@ class AudioConfigWidget(QWidget):
         # Save Button
         save_button = QPushButton('Save')
         save_button.setFont(font)  # Apply the font
-        save_button.clicked.connect(lambda: self.save_config(profile_combo_box.currentText(),
-                                                            combo_box1.currentText(),
-                                                            switch_slider.value(),
-                                                            filter_combo_box.currentText(),
-                                                            animation_combo_box.currentText(),
-                                                            hook_slider.value(),
-                                                            overlays_combo_box.currentText(),
-                                                            cc_filter_combo_box.currentText(),
-                                                            auto_generated_combo_box.currentText(),
-                                                            text_color_combo_box.currentText(),
-                                                            stroke_size_combo_box.currentText(),
-                                                            ))
+        save_button.clicked.connect(self.save_config)
 
         # Create a vertical spacer to push the save button to the bottom
         spacer = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
-
-        # Add the spacer to the layout
         layout.addItem(spacer)
 
         # Add the save button to the layout
         layout.addWidget(save_button, alignment=Qt.AlignBottom)  # Align the save button to the bottom of the window
-
         license_build_layout = QHBoxLayout()
         license_build_layout.setSpacing(0)  # Remove spacing between labels
 
         # Create a QVBoxLayout for license and build information
         license_build_vlayout = QVBoxLayout()
-        
         license_label = QLabel('License status: Active')
         license_font = QFont()
         license_font.setPointSize(7)
@@ -459,7 +406,6 @@ class AudioConfigWidget(QWidget):
 
         # Add the license_build_layout to the main layout
         layout.addLayout(license_build_layout)
-
         layout.addWidget(save_button, alignment=Qt.AlignBottom)  # Align the save button to the bottom of the window
 
         self.setLayout(layout)
@@ -471,21 +417,40 @@ class AudioConfigWidget(QWidget):
     def initialize_hashtags(self):
         print("Initializing hashtags...")
 
-    def save_config(self, profile, audio_class, enable_keyframes, selected_filter, selected_animation, enable_hook, selected_overlays, selected_cc_filter):
-        config = {
-            'audio_class': audio_class,
-            'enable_keyframes': enable_keyframes,
-            'filter': selected_filter,
-            'animation': selected_animation,
-            'enable_hook': enable_hook,
-            'overlays': selected_overlays,
-            'cc_filter': selected_cc_filter
+    def save_config(self):
+        try:
+            with open('config.json', 'r') as file:
+                profiles = json.load(file)
+        except FileNotFoundError:
+            profiles = {}
+
+        # Update the profiles dictionary with the selected profile
+        profiles[self.profile_combo_box.currentText()] = {
+            'audio_class': self.audio_class_box.currentText(),
+            'enable_keyframes': self.keyframes_slider.value(),
+            'filter': self.filter_combo_box.currentText(),
+            'animation_in_type': self.animation_in_combo_box.currentText(),
+            'animation_in_timer': self.animation_in_tmr_combo_box.currentText(),
+            'enable_hook': self.hook_slider.value(),
+            'overlays': self.overlays_combo_box.currentText(),
+            'cc_filter': self.cc_filter_combo_box.currentText(),
+            'auto_gen_text': self.auto_generated_combo_box.currentText(),
+            'highlighted_text_colour': self.highlight_text_color_combo_box.currentText(),
+            'text_font': self.font_combo_box.currentText(),
+            'text_outline': self.text_outline_combo_box.currentText(),
+            'text_glow': self.text_glow_combo_box.currentText(),
+            'animation_text': self.text_animation_combo_box.currentText(),
+            'caption_if': self.if_caption_text_combo_box.currentText(),
+            'animation_if': self.if_animation_text_combo_box.currentText(),
+            'overlay_animation_in': self.overlay_animation_in_text_combo_box.currentText(),
+            'stroke_size': self.stroke_size_combo_box.currentText(),
+            'caption': self.caption_combo_box.currentText() 
         }
-        with open('config.json', 'r') as config_file:
-            profiles = json.load(config_file)
-            profiles[profile] = config
-        with open('config.json', 'w') as config_file:
-            json.dump(profiles, config_file, indent=4)
+
+        with open('config.json', 'w') as file:
+            json.dump(profiles, file, indent=4)
+
+        # Optional: Provide feedback to the user
         print('Configuration saved.')
 
 class SwitchSlider(QSlider):
