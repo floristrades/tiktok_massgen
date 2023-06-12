@@ -293,7 +293,7 @@ class AudioConfigWidget(QWidget):
         text_animation_size.setFont(font)
         text_animation_layout.addWidget(text_animation_size)
         self.text_animation_combo_box = QComboBox()
-        self.text_animation_combo_box.addItems(['CAP: Shimmer + neg_glow', 'CAP: Ripple II', 'CAP: Ripple III', 'CAP: Spring', 'CAP: Word by word', 'ANI: Bounce in_0.2s'])
+        self.text_animation_combo_box.addItems(['CAP: Shimmer + neg_glow', 'CAP: Ripple III', 'CAP: Spring', 'CAP: Word by word', 'ANI: Bounce in_0.2s'])
         self.text_animation_combo_box.setFixedWidth(125)
         text_animation_layout.addWidget(self.text_animation_combo_box)
         new_section_layout.addLayout(text_animation_layout)
