@@ -65,7 +65,7 @@ class AudioConfigWidget(QWidget):
         audioLib_frame_layout.addWidget(audioLib_button)
 
         # Manage hashtags button
-        hashtags_button = QPushButton("Manage hashtags", self)
+        hashtags_button = QPushButton("Initialize editor", self)
         hashtags_button.setFont(font)  # Apply the font
         audioLib_frame_layout.addWidget(hashtags_button)
         # Connect the button's clicked signal to the method
@@ -393,8 +393,8 @@ class AudioConfigWidget(QWidget):
         subprocess.call(["start", file_path], shell=True)
 
     def initialize_hashtags(self):
-        print("Initializing hashtags...")
-
+        print("Initializing editor...")
+        subprocess.Popen(["python", "./main/start.pyw"])
     def save_config(self):
         try:
             with open('config.json', 'r') as file:

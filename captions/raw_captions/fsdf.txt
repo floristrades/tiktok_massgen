@@ -1,0 +1,311 @@
+In desired outcome down below i have visualized for you how i would want it done,
+
+all the values that we're NOT the MAX or the MIN value have to be stripped thus reducing the amount of pivot numbers and only leaving the 0 flag
+and the correct MAX or MIN values
+
+pv_nr: pivot_number
+
+Current outcome:
+# pv_nr   Letter  Flag Price      Result
+    0        C     0  1517.17      NaN
+    1        A     0  1521.15      NaN
+    2        C     0  1518.98      NaN
+    3        A     0  1521.39      NaN
+    4        C     0  1518.43      NaN
+    5        A     0  1531.33      NaN
+    6        C     0  1522.79      NaN
+    7        A     0  1541.04      NaN
+    8        C     0  1537.41      NaN
+    9        A     0  1543.83      NaN
+    10       C     0  1540.11      NaN
+    11       A     1  1550.34  1551.46 <
+    12       A     1  1551.46  1551.46 < Sub-range A (CORRECT MAX VALUE)
+    13       C     0  1540.90      NaN
+    14       A     0  1551.00      NaN
+    15       C     0  1546.93      NaN
+    16       A     0  1553.51      NaN
+    17       C     0  1546.20      NaN
+    18       A     1  1588.66  1588.66 < Sub-range A (CORRECT MAX VALUE)
+    19       A     1  1580.02  1588.66 <
+    20       A     1  1579.47  1588.66 <
+    21       C     0  1573.46      NaN
+    22       A     0  1577.78      NaN
+    23       C     0  1570.20      NaN
+    24       A     1  1577.99  1579.30 <
+    25       A     1  1579.30  1579.30 < Sub-range A (CORRECT MAX VALUE)
+    26       C     1  1571.43  1560.78 <
+    27       C     1  1560.78  1560.78 < Sub-range C (CORRECT MIN VALUE)
+    28       A     0  1568.52      NaN
+    29       C     1  1562.99  1555.28 <
+    30       C     1  1555.28  1555.28 < Sub-range C (CORRECT MIN VALUE)
+    31       C     1  1557.94  1555.28 < 
+    32       A     0  1570.81      NaN
+    33       C     0  1563.22      NaN
+    34       A     1  1569.54  1571.60 < 
+    35       A     1  1571.60  1571.60 < Sub-range A (CORRECT MAX VALUE)
+    36       C     0  1565.53      NaN
+    37       A     0  1573.10      NaN
+    38       C     0  1569.56      NaN
+
+Desired outcome:
+# pv_nr   Letter  Flag Price      Result
+    0        C     0  1517.17      NaN
+    1        A     0  1521.15      NaN
+    2        C     0  1518.98      NaN
+    3        A     0  1521.39      NaN
+    4        C     0  1518.43      NaN
+    5        A     0  1531.33      NaN
+    6        C     0  1522.79      NaN
+    7        A     0  1541.04      NaN
+    8        C     0  1537.41      NaN
+    9        A     0  1543.83      NaN
+    10       C     0  1540.11      NaN
+    11       A     1  1550.34  1551.46 < THESE PIVOT NUMBERS HAVE TO BE STRIPPED
+    12       A     1  1551.46  1551.46 < THIS ONE STAYS
+    13       C     0  1540.90      NaN
+    14       A     0  1551.00      NaN
+    15       C     0  1546.93      NaN
+    16       A     0  1553.51      NaN
+    17       C     0  1546.20      NaN
+    18       A     1  1588.66  1588.66 < THIS ONE STAYS
+    19       A     1  1580.02  1588.66 < THESE PIVOT NUMBERS HAVE TO BE STRIPPED
+    20       A     1  1579.47  1588.66 < THESE PIVOT NUMBERS HAVE TO BE STRIPPED
+    21       C     0  1573.46      NaN
+    22       A     0  1577.78      NaN
+    23       C     0  1570.20      NaN
+    24       A     1  1577.99  1579.30 < THESE PIVOT NUMBERS HAVE TO BE STRIPPED
+    25       A     1  1579.30  1579.30 < THIS ONE STAYS
+    26       C     1  1571.43  1560.78 < THESE PIVOT NUMBERS HAVE TO BE STRIPPED
+    27       C     1  1560.78  1560.78 < THIS ONE STAYS
+    28       A     0  1568.52      NaN
+    29       C     1  1562.99  1555.28 < THESE PIVOT NUMBERS HAVE TO BE STRIPPED
+    30       C     1  1555.28  1555.28 < THIS ONE STAYS
+    31       C     1  1557.94  1555.28 < THESE PIVOT NUMBERS HAVE TO BE STRIPPED
+    32       A     0  1570.81      NaN
+    33       C     0  1563.22      NaN
+    34       A     1  1569.54  1571.60 < THESE PIVOT NUMBERS HAVE TO BE STRIPPED
+    35       A     1  1571.60  1571.60 < THIS ONE STAYS
+    36       C     0  1565.53      NaN
+    37       A     0  1573.10      NaN
+    38       C     0  1569.56      NaN
+
+Sub-range A (Highs) the MAX value would we cluster into
+Sub-range B (Lows) the MIN value would we cluster into
+
+Code:
+import pandas as pd
+import numpy as np
+
+def calculate_pivots_filter_v2(prices, void_range=0):
+    pivots = []
+    highs = [price['high'] for price in prices]
+    lows = [price['low'] for price in prices]
+    
+    for i in range(1, len(highs) - 1):
+        # Pivot 'A': a high greater than both its preceding and following highs
+        if highs[i] > highs[i - 1] and highs[i] > highs[i + 1]:
+            if void_range > 0 and i + void_range <= len(highs) - 1:
+                if all(highs[i] > x for x in highs[i+1:i+void_range+1]):
+                    pivots.append(('A', i, highs[i]))
+            elif void_range == 0:
+                pivots.append(('A', i, highs[i]))
+
+        # Pivot 'C': a low lesser than both its preceding and following lows
+        elif lows[i] < lows[i - 1] and lows[i] < lows[i + 1]:
+            if void_range > 0 and i + void_range <= len(lows) - 1:
+                if all(lows[i] < x for x in lows[i+1:i+void_range+1]):
+                    pivots.append(('C', i, lows[i]))
+            elif void_range == 0:
+                pivots.append(('C', i, lows[i]))
+    
+    return pivots
+
+def calculate_sensitivity_v2(prices, sensitivity=0.1, void_range=0):
+    dots = []
+    opens = [price['open'] for price in prices]
+    highs = [price['high'] for price in prices]
+    lows = [price['low'] for price in prices]
+    closes = [price['close'] for price in prices]
+
+    for i in range(1, len(opens) - 1):
+        if void_range > 0 and i + void_range <= len(opens) - 1:
+            if abs(opens[i] - lows[i]) <= sensitivity and all(abs(opens[i] - lows[i]) <= abs(opens[x] - lows[x]) for x in range(i+1, i+void_range+1)):
+                dots.append(('G', i, opens[i]))
+            elif abs(closes[i] - highs[i]) <= sensitivity and all(abs(closes[i] - highs[i]) <= abs(closes[x] - highs[x]) for x in range(i+1, i+void_range+1)):
+                dots.append(('G', i, closes[i]))
+        else:
+            if abs(opens[i] - lows[i]) <= sensitivity:
+                dots.append(('G', i, opens[i]))
+            elif abs(closes[i] - highs[i]) <= sensitivity:
+                dots.append(('G', i, closes[i]))
+
+    return dots
+
+def plot_pivot_sensitivity_margin_v2(csv_file, num_ranges=1, connect_dots=True, void_range=0, max_lines=125):
+    df = pd.read_csv(csv_file, index_col=0, parse_dates=True)
+
+    directory = f'assets/pivot_void_r_{void_range}'
+    os.makedirs(directory, exist_ok=True)
+
+    for i in range(num_ranges):
+        starting_point = i * max_lines
+        ending_point = (i + 1) * max_lines
+        df_subset = df.iloc[starting_point:ending_point]
+        df_subset.index = pd.to_datetime(df_subset.index)
+
+        prices = df_subset[['open', 'high', 'low', 'close']].to_dict('records')
+        pivots_voided = calculate_pivots_filter_v2(prices, void_range)
+        green_dots = calculate_sensitivity_v2(prices, sensitivity=0.00001)
+
+        fig, ax = plt.subplots(figsize=(26, 12))
+        mpf.plot(df_subset, type='candle', ax=ax, show_nontrading=True, tight_layout=True)
+
+        for pivot in pivots_voided:
+            pivot_type, pivot_index, pivot_price = pivot
+            pivot_time = df_subset.index[pivot_index]
+            ax.scatter(pivot_time, pivot_price, color='red', marker='o')
+            ax.annotate(pivot_type, (pivot_time, pivot_price), xytext=(-10, 10),
+                        textcoords='offset points', arrowprops=dict(arrowstyle='->', connectionstyle='arc3,rad=.2'))
+
+        for dot in green_dots:
+            dot_type, dot_index, dot_price = dot
+            dot_time = df_subset.index[dot_index]
+            ax.scatter(dot_time, dot_price, color='green', marker='o')
+            ax.annotate(dot_type, (dot_time, dot_price), xytext=(-10, 10),
+                        textcoords='offset points', arrowprops=dict(arrowstyle='->', connectionstyle='arc3,rad=.2'))
+
+        if connect_dots:
+            combined_pivots = sorted(pivots_voided + green_dots, key=lambda x: x[1])
+            scatter_x = [df_subset.index[pivot[1]] for pivot in combined_pivots]
+            scatter_y = [pivot[2] for pivot in combined_pivots]
+            ax.plot(scatter_x, scatter_y, color='blue', linewidth=0.5)
+
+        plt.title(f'{csv_file} - Range {i+1}')
+        plt.ylabel('Price')
+
+        pivot_labels = "A: Higher high\nB: Lower high\nC: Lower low\nD: Higher low\nG: Sensitive point"
+        plt.text(1, 1, pivot_labels, transform=ax.transAxes, horizontalalignment='right', verticalalignment='top')
+
+        pivot_count = len(pivots_voided)
+        plt.text(0, 1, f'Pivots: {pivot_count}', transform=ax.transAxes, horizontalalignment='left', verticalalignment='top')
+
+        capture_time = datetime.now().strftime('%Y%m%d_%H%M%S')
+        save_path = os.path.join(directory, f'plot_range{i+1}_void{void_range}_{capture_time}.png')
+        plt.savefig(save_path)
+
+        plt.show()
+
+# Set the display options to show all rows
+pd.set_option('display.max_rows', None)
+
+def print_letters_chronological(csv_file, num_ranges=1, void_range=0, max_lines=125):
+    df = pd.read_csv(csv_file, index_col=0, parse_dates=True)
+
+    letters = []  # List to store the letters
+    flags = []  # List to store the flags
+    prices = []  # List to store the prices
+
+    for i in range(num_ranges):
+        starting_point = i * max_lines
+        ending_point = (i + 1) * max_lines
+        df_subset = df.iloc[starting_point:ending_point]
+        df_subset.index = pd.to_datetime(df_subset.index)
+
+        subset_prices = df_subset[['open', 'high', 'low', 'close']].to_dict('records')
+        pivots_voided = calculate_pivots_filter_v2(subset_prices, void_range)
+        green_dots = calculate_sensitivity_v2(subset_prices, sensitivity=0.00001)
+
+        for pivot in pivots_voided:
+            pivot_type, pivot_index, pivot_price = pivot
+            letters.append(pivot_type)  # Append the pivot letter
+            flags.append(0)  # Default flag value of 0
+            prices.append(pivot_price)  # Append the pivot price
+
+        for dot in green_dots:
+            dot_type, dot_index, dot_price = dot
+            letters.append(dot_type)  # Append the sensitivity dot letter
+            flags.append(0)  # Default flag value of 0
+            prices.append(dot_price)  # Append the sensitivity dot price
+
+    # Iterate through the letters to flag the pivots with duplicates before or after them
+    for i in range(len(letters)):
+        if letters[i] == 'X':
+            flags[i] = 0  # Set flag to 0 for 'C' letter
+        else:
+            if i > 0 and letters[i] == letters[i - 1]:
+                flags[i] = 1  # Flag the current pivot if it has a duplicate before it
+            elif i < len(letters) - 1 and letters[i] == letters[i + 1]:
+                flags[i] = 1  # Flag the current pivot if it has a duplicate after it
+
+    df_letters = pd.DataFrame({'Letter': letters, 'Flag': flags, 'Price': prices})  # Create a DataFrame with letters, flags, and prices
+    return df_letters
+
+def find_max_min(df):
+    # Initialize the result column with NaN
+    df['Result'] = np.nan
+
+    # Initialize the current letter and the start index
+    current_letter = None
+    start_index = None
+    sub_range_A_max = None
+    sub_range_C_min = None
+
+    # Iterate over the DataFrame rows
+    for i, row in df.iterrows():
+        # If we find a flagged letter
+        if row['Flag'] == 1:
+            # If the letter is different from the current one or if the previous flag was 0
+            if row['Letter'] != current_letter or (i > 0 and df.loc[i - 1, 'Flag'] == 0):
+                # If there is a previous sequence
+                if start_index is not None:
+                    # Calculate the min or max price in the sequence
+                    if current_letter == 'A':
+                        sub_range_A_max = df.loc[start_index:i-1, 'Price'].max()
+                    elif current_letter == 'C':
+                        sub_range_C_min = df.loc[start_index:i-1, 'Price'].min()
+
+                    # Update the 'Result' column for the previous sequence
+                    df.loc[start_index:i-1, 'Result'] = sub_range_A_max if current_letter == 'A' else sub_range_C_min
+
+                # Start a new sequence
+                current_letter = row['Letter']
+                start_index = i
+        elif row['Flag'] == 0 and start_index is not None:
+            # Calculate the min or max price in the sequence
+            if current_letter == 'A':
+                sub_range_A_max = df.loc[start_index:i-1, 'Price'].max()
+            elif current_letter == 'C':
+                sub_range_C_min = df.loc[start_index:i-1, 'Price'].min()
+
+            # Reset the current letter and start index
+            current_letter = None
+            start_index = None
+
+    # Calculate the min or max price for the last sequence if it exists
+    if start_index is not None:
+        if current_letter == 'A':
+            sub_range_A_max = df.loc[start_index:, 'Price'].max()
+        elif current_letter == 'C':
+            sub_range_C_min = df.loc[start_index:, 'Price'].min()
+
+        # Update the 'Result' column for the last sequence
+        df.loc[start_index:, 'Result'] = sub_range_A_max if current_letter == 'A' else sub_range_C_min
+
+    # Filter out the pivot numbers that need to be stripped
+    df['DuplicateBefore'] = df['Flag'].shift(1) == 1
+    df['DuplicateAfter'] = df['Flag'].shift(-1) == 1
+    df['Strip'] = (df['Letter'] == 'A') & (df['DuplicateBefore'] | df['DuplicateAfter'])
+    df.loc[df['Strip'], 'Result'] = np.nan
+
+    # Drop the intermediate columns
+    df = df.drop(columns=['DuplicateBefore', 'DuplicateAfter', 'Strip'])
+
+    return df
+
+# Let's assume df_letters is your DataFrame
+result_df = find_max_min(letter_df)
+print(result_df)
+csv_file = r'datasets\xauusd\isolated\XAUUSD_60m_jan2020_isolated_data_1.csv'
+#plot_pivot_sensitivity_margin_v2(csv_file, num_ranges=2, connect_dots=True, void_range=0, max_lines=100)
+letter_df = print_letters_chronological(csv_file, num_ranges=5, void_range=0, max_lines=100)
+#print(letter_df)
