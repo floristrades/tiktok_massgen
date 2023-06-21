@@ -389,12 +389,12 @@ class AudioConfigWidget(QWidget):
 
     def initialize_audioLib(self):
         print("Initializing audio library...")
-        file_path = os.path.abspath("yt_mp3_fetcher.pyw")
+        file_path = os.path.abspath("yt_mp3_fetcher.py")
         subprocess.call(["start", file_path], shell=True)
 
     def initialize_hashtags(self):
         print("Initializing editor...")
-        subprocess.Popen(["python", "./main/start.pyw"])
+        subprocess.Popen(["python", "./main/start.py"])
     def save_config(self):
         try:
             with open('config.json', 'r') as file:

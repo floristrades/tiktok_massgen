@@ -1,1 +1,70 @@
-{"new_project": [1828, 468], "settings_main": [2089, 394], "home_main": [1341, 523], "search_project": [2121, 575], "maximize_app": [2155, 395], "adjustment": [459, 49], "audio": [92, 49], "auto_snapping": [3165, 810], "effects": [265, 48], "export": [3283, 16], "filters": [392, 50], "import_left": [60, 147], "import": [769, 433], "layout": [3077, 19], "library": [69, 185], "linkage": [3125, 808], "media": [37, 48], "menu": [107, 17], "modify": [3383, 768], "preview_axis": [3243, 807], "select_mode": [35, 809], "shortcut": [3170, 18], "stickers": [207, 48], "text": [152, 49], "track_magnet": [3126, 808], "transition": [329, 48]}
+{
+    "new_project": null,
+    "settings_main": [
+        2089,
+        394
+    ],
+    "home_main": [
+        1341,
+        523
+    ],
+    "search_project": [
+        2121,
+        575
+    ],
+    "maximize_app": [
+        2877,
+        330
+    ],
+    "adjustment": null,
+    "audio": null,
+    "auto_snapping": [
+        2653,
+        796
+    ],
+    "effects": null,
+    "export": [
+        2771,
+        328
+    ],
+    "filters": null,
+    "import_left": null,
+    "import": null,
+    "layout": [
+        2565,
+        331
+    ],
+    "library": null,
+    "linkage": [
+        2613,
+        794
+    ],
+    "media": null,
+    "menu": null,
+    "modify": [
+        2871,
+        754
+    ],
+    "preview_axis": [
+        2731,
+        793
+    ],
+    "select_mode": null,
+    "shortcut": [
+        2658,
+        330
+    ],
+    "stickers": null,
+    "text": null,
+    "track_magnet": [
+        2614,
+        794
+    ],
+    "transition": null,
+    "close_import": [
+        194,
+        322
+    ],
+    "filename_search": null,
+    "open_import": null
+}

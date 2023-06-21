@@ -10,7 +10,7 @@ import time
 
 time.sleep(2)
 
-# Define button details
+# Home page buttons
 buttons = [
     {
         "name": "new_project",
@@ -37,9 +37,8 @@ buttons = [
         "image_paths": [r"main\button_reference\maximize.png", r"main\button_reference\maximize_alt.png", r"main\button_reference\maximize_alt2.png"],
         "threshold": 0.7
     },
-    # Add more buttons as needed
 ]
-
+# Project page buttons
 button_project = [
     {
         "name": "adjustment",
@@ -149,14 +148,33 @@ button_project = [
     # Add more buttons as needed
 ]
 
+# Media import buttons
+buttons_media_import = [
+    {
+        "name": "close_import",
+        "image_paths": [r"main\button_reference\import_video_page\close_import.png", r"main\button_reference\import_video_page\close_import_alt.png"],
+        "threshold": 0.8
+    },
+    {
+        "name": "filename_search",
+        "image_paths": [r"main\button_reference\import_video_page\filename_search.png", r"main\button_reference\import_video_page\filename_search_alt.png"],
+        "threshold": 0.7
+    },
+    {
+        "name": "open_import",
+        "image_paths": [r"main\button_reference\import_video_page\open_import.png", r"main\button_reference\import_video_page\open_import_alt.png", r"main\button_reference\import_video_page\open_import_alt2.png"],
+        "threshold": 0.8
+    }
+]
+
 # Create a Tkinter window
 window = tk.Tk()
 window.title("Button Health Check")
-window.geometry("400x300")
+window.geometry("700x500")
 window.attributes("-topmost", True)  # Set window as topmost
 
 # Create a ScrolledText widget to display the console log
-log_text = ScrolledText(window, height=10, width=40, font=("Courier New", 8))
+log_text = ScrolledText(window, height=40, width=70, font=("Courier New", 8))
 log_text.pack(padx=10, pady=10)
 
 import json
@@ -165,31 +183,31 @@ import numpy as np
 def check_button_presence(button):
     image_paths = button["image_paths"]
     threshold = button["threshold"]
-    
+
     # Iterate over image paths
     for image_path in image_paths:
         reference_button_image = cv2.imread(image_path, 0)
-    
+
         # Capture a screenshot
         screenshot = pyautogui.screenshot()
         screenshot = cv2.cvtColor(np.array(screenshot), cv2.COLOR_RGB2GRAY)
-    
+
         # Perform template matching
         result = cv2.matchTemplate(screenshot, reference_button_image, cv2.TM_CCOEFF_NORMED)
         locations = np.where(result >= threshold)
-    
+
         coordinates = []
-    
+
         if len(locations[0]) > 0:
             min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(result)
             w, h = reference_button_image.shape[::-1]
-        
+
             for pt in zip(*locations[::-1]):
                 x = int(pt[0] + w // 2)  # Convert to Python int
                 y = int(pt[1] + h // 2)  # Convert to Python int
                 coordinates.append((x, y))
                 break  # Exit the loop if button is found
-    
+
         # Load existing data from the JSON file
         output_filename = "coordinates.json"
         existing_data = {}
@@ -198,18 +216,18 @@ def check_button_presence(button):
                 existing_data = json.load(f)
         except FileNotFoundError:
             pass
-    
+
         # Update coordinates under the button name
         button_name = button["name"]
         existing_data[button_name] = coordinates[0] if coordinates else None
-    
+
         # Save coordinates to the JSON file
         with open(output_filename, "w") as f:
-            json.dump(existing_data, f)
-    
+            json.dump(existing_data, f, indent=4)  # Save with indentation
+
         if coordinates:
             return coordinates[0]
-    
+
     return None
 
 def check_button_presence_project(button):
@@ -255,7 +273,7 @@ def check_button_presence_project(button):
 
         # Save coordinates to the JSON file
         with open(output_filename, "w") as f:
-            json.dump(existing_data, f)
+            json.dump(existing_data, f, indent=4)  # Save with indentation
 
         if coordinates:
             return coordinates[0]
@@ -266,11 +284,11 @@ def check_button_presence_project(button):
 # Function to focus CapCut.exe windows
 def focus_capcut_windows():
     capcut_windows = []
-    
+
     def enum_handler(hwnd, _):
         if win32gui.GetWindowText(hwnd) == "CapCut":
             capcut_windows.append(hwnd)
-    
+
     win32gui.EnumWindows(enum_handler, None)
     for hwnd in capcut_windows:
         win32gui.ShowWindow(hwnd, win32con.SW_SHOW)
@@ -278,50 +296,78 @@ def focus_capcut_windows():
 
 # Function to update the console log and summary
 def update_log():
-    total_buttons = len(buttons) + len(button_project)
+    total_buttons = len(buttons) + len(button_project) + len(buttons_media_import)
     passed_count = 0
-    
+
     log_text.delete("1.0", tk.END)  # Clear previous log
-    
+
     # Focus CapCut.exe windows
     focus_capcut_windows()
-    
+
+    # Perform button checks on the home page buttons
     for button in buttons:
         button_name = button["name"]
         button_present = check_button_presence(button)
-        
+
         if button_present:
-            log_text.insert(tk.END, f"Button {button_name} has been found! Passed health check!\n")
+            log_text.insert(tk.END, f"Found: {button_name}\n")
             passed_count += 1
         else:
             log_text.insert(tk.END, f"Button {button_name} has not been found.\n")
-    
-    # After click_coordinates() has been executed, check buttons in button_project
-    click_coordinates()
-    
+
+    # Navigate to the project page and perform button checks
+    navigate_project_page()
+
     for button in button_project:
         button_name = button["name"]
         button_present = check_button_presence_project(button)
-        
+
         if button_present:
-            log_text.insert(tk.END, f"Button {button_name} has been found! Passed health check!\n")
+            log_text.insert(tk.END, f"Found: {button_name}\n")
             passed_count += 1
         else:
             log_text.insert(tk.END, f"Button {button_name} has not been found.\n")
-    
+
+    # Navigate to the media page and perform button checks
+    navigate_media_page()
+
+    media_page_passed_count = 0  # Count of passed buttons on the media page
+
+    for button in buttons_media_import:
+        button_name = button["name"]
+        button_present = check_button_presence(button)
+
+        if button_present:
+            log_text.insert(tk.END, f"Found: {button_name} \n")
+            media_page_passed_count += 1
+        else:
+            log_text.insert(tk.END, f"Button {button_name} has not been found.\n")
+
     # Update summary
     summary_text = f"Passed: {passed_count}/{total_buttons} ({(passed_count/total_buttons)*100:.2f}% Health)\n"
     log_text.insert(tk.END, summary_text)
     log_text.see(tk.END)  # Scroll to the end of the log
-        
+
     # Calculate health percentage
     health_percentage = (passed_count / total_buttons) * 100
 
+    # If health is 100% on the media page and import page, close the import dialog
+    if health_percentage == 100 and media_page_passed_count == len(buttons_media_import):
+        # Close the import dialog using Alt+F4
+        pyautogui.hotkey('alt', 'f4')
+        log_text.insert(tk.END, "Pressed Alt+F4 to close the import dialog\n")
+    else:
+        # Wait for a moment and call update_log() again
+        window.after(1000, update_log)
+
     # If health is 100%, click coordinates
     if health_percentage == 100:
-        click_coordinates()
+        navigate_project_page()
 
-def click_coordinates():
+
+
+
+def navigate_project_page():
     time.sleep(2)
     # Load coordinates from JSON file
     with open('coordinates.json') as file:
@@ -345,6 +391,34 @@ def click_coordinates():
         log_text.insert(tk.END, f"Clicked maximize app at ({x}, {y})\n")
     else:
         log_text.insert(tk.END, "Coordinates for 'maximize_app' not found in JSON.\n")
+
+def navigate_media_page():
+    time.sleep(2)
+    # Load coordinates from JSON file
+    with open('coordinates.json') as file:
+        coordinates = json.load(file)
+
+    # Click the 'import' coordinates on the media page
+    import_coords = coordinates.get('import')
+    if import_coords:
+        x, y = import_coords
+        pyautogui.click(x, y, button='left')
+        log_text.insert(tk.END, f"Clicked 'import' button on the media page at ({x}, {y})\n")
+    else:
+        log_text.insert(tk.END, "Coordinates for 'import' button on the media page not found in JSON.\n")
+
+    # Wait for the import dialog to appear
+    time.sleep(2)
+
+    # Click the 'close_import' coordinates
+    close_import_coords = coordinates.get('close_import')
+    if close_import_coords:
+        x, y = close_import_coords
+        pyautogui.hotkey('alt', 'f4')
+        log_text.insert(tk.END, f"Pressed Alt+F4 to close the import dialog\n")
+    else:
+        log_text.insert(tk.END, "Coordinates for 'close_import' button not found in JSON.\n")
+
 
 
 # Call the update_log() function to start straight away

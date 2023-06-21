@@ -36,7 +36,7 @@ def update_output():
         output_text.insert(tk.END, "Found running CapCut processes:\n")
         output_text.insert(tk.END, "Initializing health check...\n")
         time.sleep(1)
-        subprocess.Popen(['python', "main/health_check.pyw"])
+        subprocess.Popen(['python', "main/health_check.py"])
         
         for name in running_capcut_processes:
             output_text.insert(tk.END, f"Name: {name}\n")
@@ -53,11 +53,11 @@ def update_output():
                     output_text.insert(tk.END, "Initializing health check...\n")
                     open_executable(filepath)
                     time.sleep(1)
-                    subprocess.Popen(['python', "main/health_check.pyw"])
+                    subprocess.Popen(['python', "main/health_check.py"])
                     window.destroy()
                 else:
                     output_text.insert(tk.END, "No file path specified in filepaths.txt.\n")
-                    output_text.insert(tk.END, "Launching health_check.pyw...\n")
+                    output_text.insert(tk.END, "Launching health_check.py...\n")
                     window.destroy()  # Close the current window
         
         except FileNotFoundError:
